@@ -1,0 +1,517 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#5B43EF">
+<title>印記｜耗材領用回報 v5</title>
+<style>
+  :root{
+    --brand:#5B43EF; --brand-d:#4630D6; --brand-soft:#EEEBFF;
+    --ink:#1B1B24; --sub:#5F5F70; --line:#E3E3EC; --bg:#FFFFFF; --card:#F6F6FA;
+    --pink:#E99BB4; --peri:#8E96F0; --danger:#C62F35; --ok:#1F7D5E;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:"Noto Sans TC","Noto Sans CJK TC","PingFang TC","Microsoft JhengHei",sans-serif;color:var(--ink);font-size:16px;line-height:1.6;background:var(--bg);-webkit-font-smoothing:antialiased}
+  .app{max-width:520px;margin:0 auto;padding-bottom:40px}
+  header.top{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 4px}
+  .logo{font-weight:900;font-size:26px;color:var(--brand)}
+  .logo small{font-size:16px;color:var(--sub);font-weight:500;margin-left:6px}
+  .hero{display:flex;justify-content:space-between;align-items:flex-end;gap:8px;padding:8px 20px 0}
+  .hero h1{font-size:24px;line-height:1.4}
+  .hero h1 b{color:var(--brand)}
+  .hero svg{width:96px;flex:none}
+  .notice{margin:10px 20px 0;padding:10px 14px;border-radius:12px;background:var(--card);color:var(--sub)}
+  nav.anchors{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.96);backdrop-filter:blur(6px);border-bottom:1px solid var(--line);margin-top:12px}
+  nav.anchors .in{display:grid;grid-template-columns:repeat(4,1fr);max-width:520px;margin:0 auto;padding:0 8px}
+  nav.anchors a{display:flex;align-items:center;justify-content:center;min-height:48px;text-decoration:none;color:var(--sub);font-weight:700;font-size:16px;text-align:center;line-height:1.25}
+  nav.anchors a:hover{color:var(--brand)}
+  section.region{scroll-margin-top:60px;padding:8px 0 4px}
+  .region>h2{margin:22px 20px 4px;font-size:21px}
+  .region>h2:focus{outline:none}
+  .machine{margin:12px 20px 0;background:var(--brand);color:#fff;border-radius:18px;padding:16px 18px 0}
+  .machine .row{display:flex;justify-content:space-between;align-items:flex-end;gap:8px;flex-wrap:wrap}
+  .machine .lbl{font-size:16px}
+  .machine .val{font-size:21px;font-weight:700}
+  .machine .val span{white-space:nowrap}
+  .machine .split{display:flex;margin-top:12px;border-top:1px solid rgba(255,255,255,.3)}
+  .machine .split div{flex:1;text-align:center;padding:10px 0;font-size:16px}
+  .machine .split div+div{border-left:1px solid rgba(255,255,255,.3)}
+  .machine .split b{display:block;font-size:17px}
+  .block{margin:22px 20px 0;scroll-margin-top:72px}
+  .block h3{font-size:18px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+  .step{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--brand-soft);color:var(--brand);font-size:16px}
+  .seg{display:flex;background:var(--card);border:1.5px solid var(--line);border-radius:999px;padding:4px}
+  .seg button{flex:1;border:none;background:none;min-height:48px;border-radius:999px;font:inherit;font-weight:700;color:var(--sub);cursor:pointer}
+  .seg button[aria-pressed="true"]{background:var(--brand);color:#fff}
+  .hint{color:var(--sub);margin-top:6px}
+  .group-title{color:var(--sub);margin:12px 0 6px;font-size:16px}
+  .items{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .item{border:1.5px solid var(--line);background:#fff;border-radius:14px;padding:8px 12px;text-align:left;font:inherit;min-height:56px;cursor:pointer;display:flex;align-items:center;gap:8px;color:var(--ink)}
+  .item .sw{width:12px;height:12px;border-radius:50%;flex:none}
+  .item .nm{flex:1;min-width:0}
+  .item .st{font-size:16px;color:var(--sub);display:block}
+  .item[aria-pressed="true"]{border-color:var(--brand);background:var(--brand-soft);font-weight:700}
+  .item:disabled{opacity:.45;cursor:not-allowed}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:8px 18px;font:inherit;min-height:48px;cursor:pointer;color:var(--ink)}
+  .chip[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:#fff;font-weight:700}
+  .field{margin-top:12px}
+  .field label{display:block;color:var(--sub);margin-bottom:6px;font-size:16px}
+  .field input,.field textarea{width:100%;border:1.5px solid var(--line);border-radius:14px;padding:0 14px;font:inherit;font-size:17px;background:var(--card);color:var(--ink)}
+  .field input{height:52px}
+  .field textarea{min-height:88px;padding:12px 14px;resize:vertical}
+  .field input:focus,.field textarea:focus{outline:none;border-color:var(--brand);background:#fff}
+  .bad{border-color:var(--danger)!important;background:#FFF5F5!important}
+  .cnt2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .qty{max-width:50%}
+  .count{color:var(--sub);text-align:right;margin-top:4px;font-size:16px}
+  .count.over{color:var(--danger);font-weight:700}
+  .err{color:var(--danger);margin-top:6px;font-weight:700}
+  .err:empty{display:none}
+  .photo{display:flex;align-items:center;gap:12px;border:1.5px dashed #CFCBEF;border-radius:16px;padding:12px;background:#FBFAFF}
+  .photo .thumb{width:72px;height:72px;border-radius:12px;background:var(--brand-soft);display:grid;place-items:center;overflow:hidden;flex:none}
+  .photo>div:last-child{min-width:0}
+  #photoName{overflow-wrap:anywhere}
+  .photo .thumb img{width:100%;height:100%;object-fit:cover}
+  .pick{display:inline-flex;align-items:center;min-height:48px;background:#fff;border:1.5px solid var(--brand);color:var(--brand);border-radius:999px;padding:0 18px;font-weight:700;cursor:pointer}
+  .photo input{position:absolute;opacity:0;width:1px;height:1px}
+  .lockNote{margin:16px 20px 0;padding:12px 16px;border-radius:14px;background:#FFF6E5;color:#7A4B00;font-weight:700}
+  .lockNote a{color:inherit}
+  #f.is-locked .item,#f.is-locked .seg button,#f.is-locked .chip{opacity:.5;cursor:not-allowed}
+  .banner{margin:20px 20px 0;padding:12px 16px;border-radius:14px;font-weight:700}
+  .banner.error{background:#FFEDEE;color:var(--danger)}
+  .banner.info{background:var(--brand-soft);color:var(--brand-d)}
+  .banner:empty{display:none}
+  .primary{display:block;width:calc(100% - 40px);margin:16px 20px 0;min-height:56px;border:none;border-radius:999px;background:var(--brand);color:#fff;font:inherit;font-size:18px;font-weight:700;cursor:pointer}
+  .primary:disabled{background:#B3A8F5;cursor:wait}
+  .secondary{display:block;width:100%;min-height:52px;border-radius:999px;border:1.5px solid var(--brand);background:#fff;color:var(--brand);font:inherit;font-weight:700;cursor:pointer;margin-top:12px}
+  .return{display:inline-flex;align-items:center;min-height:48px;color:var(--brand-d);font-weight:700;text-underline-offset:4px}
+  button:focus-visible,a:focus-visible,summary:focus-visible,.check:has(input:focus-visible),.field input:focus-visible,.field textarea:focus-visible{outline:3px solid #CA7300;outline-offset:2px}
+  .card{margin:12px 20px 0;padding:16px;border-radius:18px;background:var(--card)}
+  .empty p{color:var(--sub)}
+  .ok-title{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:700;margin-bottom:12px}
+  .ok-title i{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:var(--ok);color:#fff;font-style:normal}
+  .lifecard{border-radius:18px;padding:16px 18px;color:#fff;background:#C2577A}
+  .lifecard.first{background:#5A63C9}
+  .lifecard .pair{display:flex;gap:18px;margin-top:6px}
+  .lifecard .pair div{flex:1}
+  .lifecard .big{font-size:32px;font-weight:300;line-height:1.2}
+  .lifecard .big small{font-size:16px;margin-left:4px}
+  .sum{margin-top:12px}
+  .sum div{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+  .sum span{color:var(--sub);flex:none}
+  .sum b{text-align:right;font-weight:600;overflow-wrap:anywhere}
+  .sim{display:inline-block;margin-top:10px;color:var(--sub)}
+  .stockrow{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+  .stockrow .nm{flex:1}
+  .safe{color:var(--sub);font-size:16px}
+  .stockrow .q{font-weight:700;font-size:18px}
+  .tag{display:inline-block;font-size:16px;padding:0 8px;border-radius:999px;background:var(--brand-soft);color:var(--brand-d);font-weight:700;margin-left:4px}
+  .tag.warn{background:#FFEDEE;color:var(--danger)}
+  .rec{padding:10px 0;border-bottom:1px solid var(--line)}
+  .rec .t{display:flex;justify-content:space-between;font-weight:700;gap:8px}
+  .rec .m{color:var(--sub)}
+  details{margin-top:12px}
+  summary{min-height:48px;display:flex;align-items:center;cursor:pointer;font-weight:700}
+  .check{display:flex;align-items:center;gap:12px;min-height:52px;width:100%;padding:0 12px;margin-top:8px;border:1.5px solid var(--line);border-radius:14px;background:#fff;cursor:pointer}
+  .check input{width:28px;height:28px;flex:none;accent-color:var(--brand)}
+  .check:has(input:checked){border-color:var(--brand);background:var(--brand-soft)}
+  fieldset{border:none;margin-top:8px} legend{font-weight:700;margin-bottom:2px}
+  .about p{margin:8px 0}
+  .overlay{position:fixed;inset:0;background:rgba(20,20,30,.45);z-index:20;display:flex;align-items:flex-end;justify-content:center}
+  .overlay[hidden]{display:none}
+  .sheet{background:#fff;width:100%;max-width:520px;max-height:90vh;overflow:auto;border-radius:20px 20px 0 0;padding:20px}
+  .sheet h2{font-size:21px}
+  .sheet h2:focus{outline:none}
+  .primary.wide{width:100%;margin:16px 0 0}
+  .sum .ph{width:56px;height:56px;border-radius:10px;object-fit:cover}
+  .load{margin:12px 20px 0;padding:12px 16px;border-radius:14px;background:var(--card);color:var(--sub);font-weight:700}
+  .load[hidden]{display:none}
+  .load.error{background:#FFEDEE;color:var(--danger)}
+  .load .secondary{margin-top:10px}
+  .machine.loading .val,.machine.loading b{opacity:.55}
+  .tech h4{margin-top:14px;font-size:17px}
+  .tech pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#1B1B24;color:#F3F3F7;border-radius:12px;padding:12px;font:15px/1.5 ui-monospace,Menlo,Consolas,monospace;margin-top:6px}
+  .tech .code{display:inline-block;font-weight:700;padding:0 8px;border-radius:999px;background:var(--brand-soft);color:var(--brand-d)}
+  .tech .code.e{background:#FFEDEE;color:var(--danger)}
+  .warn{margin-top:14px;padding:12px 14px;border-radius:14px;background:#FFF6E5;color:#7A4B00;font-weight:700}
+  .warn .check{background:#fff;margin-top:10px;font-weight:700;color:var(--ink)}
+  footer{color:var(--sub);text-align:center;margin:28px 20px 0;font-size:16px}
+  @media (max-width:259px){ /* 手機文字放大 200% 時版面約只剩 195px */
+    .items,.cnt2{grid-template-columns:1fr}
+    .qty{max-width:none}
+    .hero svg{display:none}
+    nav.anchors .in{grid-template-columns:repeat(2,1fr)}
+    .photo{flex-wrap:wrap}
+    .lifecard .pair{flex-direction:column;gap:4px}
+  }
+  @media (max-width:359px){
+    .hero h1{font-size:21px}
+    .hero svg{width:76px}
+    nav.anchors a{font-size:14px}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="logo">印記<small>耗材領用回報</small></div>
+  </header>
+  <div class="hero">
+    <h1>換好耗材了嗎？<br>在機台前<br><b>60 秒</b>完成回報</h1>
+    <svg viewBox="0 0 120 120" aria-hidden="true">
+      <rect x="26" y="26" width="72" height="80" rx="18" fill="#8E96F0"/>
+      <rect x="26" y="26" width="72" height="26" rx="13" fill="#5B43EF"/>
+      <circle cx="49" cy="70" r="5" fill="#1B1B24"/><circle cx="75" cy="70" r="5" fill="#1B1B24"/>
+      <ellipse cx="41" cy="80" rx="5" ry="3" fill="#E99BB4"/><ellipse cx="83" cy="80" rx="5" ry="3" fill="#E99BB4"/>
+      <path d="M55 82q7 6 14 0" stroke="#1B1B24" stroke-width="3" fill="none" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <p class="notice">全部為模擬資料，只存在本次開啟的頁面，重新整理即清空；不會真正送出或扣減公司庫存。</p>
+</div>
+
+<nav class="anchors" aria-label="本頁區域"><div class="in">
+  <a href="#report">領用回報</a><a href="#result">本次結果</a><a href="#stock">庫存紀錄</a><a href="#about">使用說明</a>
+</div></nav>
+
+<div class="app">
+  <!-- 區域 1：領用回報 -->
+  <section class="region" id="report" aria-labelledby="reportTitle">
+    <h2 id="reportTitle" tabindex="-1">領用回報</h2>
+    <div class="machine">
+      <div class="row">
+        <div><div class="lbl">掃碼機台</div><div class="val" id="mName">MFP-01</div></div>
+        <div><div class="lbl">最近轉數（黑白／彩色）</div><div class="val"><span id="mBw">125,400</span> ／ <span id="mColor">48,200</span></div></div>
+      </div>
+      <div class="split"><div>共用庫存<b id="mStock">—</b></div><div>本次已回報<b id="mDone">0 筆</b></div></div>
+    </div>
+    <div class="load" id="loadState" role="status" hidden></div>
+
+    <p class="lockNote" id="lockNote" hidden>這筆回報已送出，欄位已鎖定。要修改請到<a href="#result">本次結果</a>按「修改這筆回報」；要回報下一筆請按「再回報一筆」。</p>
+    <form id="f" novalidate>
+      <div class="block">
+        <h3><span class="step">1</span>你的身分</h3>
+        <div class="seg" id="roles" role="group" aria-label="身分"></div>
+        <p class="hint">常用領用人與主要維修員請選「領用人」；職務代理時請選「代理人」。</p>
+        <div class="field"><label for="name">你的姓名</label><input id="name" autocomplete="off" placeholder="例：王小明"></div>
+        <p class="err" id="e-role"></p>
+      </div>
+
+      <div class="block">
+        <h3><span class="step">2</span>換了什麼</h3>
+        <div id="itemGroups"></div>
+        <p class="err" id="e-item"></p>
+        <div class="field" id="reasonWrap" hidden><label>更換原因（選填）</label><div class="chips" id="reasons"></div></div>
+      </div>
+
+      <div class="block">
+        <h3><span class="step">3</span>數量與轉數</h3>
+        <div class="field qty"><label for="qty">數量</label><input id="qty" type="number" inputmode="numeric" value="1" min="1" step="1"></div>
+        <div class="cnt2">
+          <div class="field"><label for="bw">黑白轉數</label><input id="bw" type="number" inputmode="numeric" min="0" step="1" placeholder="例：137800"></div>
+          <div class="field"><label for="color">彩色轉數</label><input id="color" type="number" inputmode="numeric" min="0" step="1" placeholder="例：51000"></div>
+        </div>
+        <p class="hint" id="counterHint"></p>
+        <p class="err" id="e-num"></p>
+      </div>
+
+      <div class="block">
+        <h3><span class="step">4</span>拍下計數器</h3>
+        <div class="photo">
+          <div class="thumb" id="thumb"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#5B43EF" stroke-width="1.8"><rect x="3" y="6" width="18" height="14" rx="3"/><circle cx="12" cy="13" r="3.5"/><path d="M8 6l1.5-2h5L16 6"/></svg></div>
+          <div><label class="pick" for="photo">開啟相機</label><input id="photo" type="file" accept="image/*" capture="environment"><p class="hint" id="photoName">尚未附照片</p></div>
+        </div>
+        <p class="err" id="e-photo"></p>
+      </div>
+
+      <div class="block">
+        <h3><span class="step">5</span>備註（選填）</h3>
+        <div class="field"><textarea id="remark" aria-label="備註" placeholder="例：舊碳粉匣有漏粉，已裝袋"></textarea><p class="count" id="remarkCount">0／100</p></div>
+        <p class="err" id="e-remark"></p>
+      </div>
+
+      <p class="banner" id="banner" role="alert"></p>
+      <button class="primary" id="submitBtn" type="submit">送出領用回報</button>
+    </form>
+  </section>
+
+  <!-- 區域 2：本次結果 -->
+  <section class="region" id="result" aria-labelledby="resultTitle">
+    <h2 id="resultTitle" tabindex="-1">本次結果</h2>
+    <div class="card" id="resultBody" aria-live="polite"></div>
+  </section>
+
+  <!-- 區域 3：庫存紀錄 -->
+  <section class="region" id="stock" aria-labelledby="stockTitle">
+    <h2 id="stockTitle">庫存紀錄</h2>
+    <div class="card"><h3 style="font-size:17px">共用庫存（兩台共用）</h3><div id="stockList"></div></div>
+    <div class="card"><h3 style="font-size:17px">本次開啟後的回報</h3><div id="recList"></div></div>
+  </section>
+
+  <!-- 區域 4：使用說明 -->
+  <section class="region about" id="about" aria-labelledby="aboutTitle">
+    <h2 id="aboutTitle">使用說明</h2>
+    <div class="card">
+      <p>這是單一 HTML 的課堂原型。掃描機台 QR Code 會以網址帶入機台（例如 ?m=MFP-02）。</p>
+      <p>資料只在本次頁面記憶體中，重新整理即清空，另開分頁也不會共用；沒有登入、資料庫或網路傳送，送出不等於公司系統已入帳。</p>
+      <details id="testBox"><summary>教學測試：模擬讀取與送出失敗</summary>
+        <label class="check"><input id="failLoad" type="checkbox">下一次讀取機台資料時模擬失敗</label>
+        <button class="secondary" id="reloadBtn" type="button">重新讀取機台資料</button>
+        <fieldset><legend>下一次確認送出時</legend>
+          <label class="check"><input type="radio" name="sendMode" value="ok" checked>正常完成</label>
+          <label class="check"><input type="radio" name="sendMode" value="fail">模擬連線失敗（可重試）</label>
+          <label class="check"><input type="radio" name="sendMode" value="conflict">模擬轉數衝突（同事剛回報較新轉數）</label>
+        </fieldset>
+        <p>失敗後已填資料與照片都會保留；觸發一次後自動回到「正常完成」。這些都是程式內的模擬，沒有網路請求。網址加上 ?fail=load 可讓開啟時第一次讀取就失敗。</p>
+      </details>
+      <details class="tech" id="techBox"><summary>查看資料怎麼往返（模擬）</summary>
+        <p>以下是「如果接上真正的服務」時的請求與回應規格構想。目前頁面<b>沒有發出 HTTP 請求</b>，內容由本頁程式模擬產生，會隨你的操作更新。</p>
+        <h4>讀取：GET 機台資料</h4><div id="logGet"><p class="hint">尚未讀取。</p></div>
+        <h4>送出：POST 領用回報</h4><div id="logPost"><p class="hint">尚未送出。按「確認送出」後會顯示請求內容與回應。</p></div>
+        <p class="hint">200／201：成功取得／成功建立；400：內容不符規則（本頁在送出前就先檢查）；409：與目前資料衝突；503：服務暫時無法使用。</p>
+      </details>
+      <a class="return" href="#report">回到領用回報</a>
+    </div>
+  </section>
+  <div class="overlay" id="confirmBox" hidden>
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+      <h2 id="confirmTitle" tabindex="-1">送出前請再確認</h2>
+      <p class="hint">請核對機台、耗材與計數器上的轉數是否都正確。</p>
+      <div class="sum" id="confirmSum"></div>
+      <div class="warn" id="jumpWarn" hidden></div>
+      <button class="primary wide" id="confirmBtn" type="button">確認送出</button>
+      <button class="secondary" id="backBtn" type="button">返回修改</button>
+    </div>
+  </div>
+  <footer>行動平台設計與管理 期中版 v5（2026/11/03）　所有機台、耗材與人名皆為虛構</footer>
+</div>
+
+<script>
+const GROUPS=[
+  {g:"碳粉",items:[["黑色碳粉","#1B1B24"],["藍色碳粉","#2F80ED"],["紅色碳粉","#E5484D"],["黃色碳粉","#F2C94C"]]},
+  {g:"滾筒",items:[["黑色滾筒","#1B1B24"],["彩色滾筒","linear-gradient(135deg,#2F80ED,#E5484D,#F2C94C)"]]},
+  {g:"顯像槽",items:[["黑色顯像槽","#1B1B24"],["藍色顯像槽","#2F80ED"],["紅色顯像槽","#E5484D"],["黃色顯像槽","#F2C94C"]]},
+  {g:"其他零件",items:[["加熱單元組","#F2994A"],["轉寫皮帶組","#9B51E0"],["出紙單元","#828282"],["定著驅動部","#4F4F4F"]]}
+];
+const ROLES=["領用人","代理人"], REASONS=["定期更換","故障排除"], REMARK_MAX=100;
+const $=id=>document.getElementById(id);
+const fmt=n=>n.toLocaleString("zh-TW");
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const params=new URLSearchParams(location.search);
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+
+/* ===== 模擬的「服務端」：只存在本頁記憶體，沒有真正的 HTTP ===== */
+const SERVER={
+  stock:{"黑色碳粉":[3,2],"藍色碳粉":[2,1],"紅色碳粉":[2,1],"黃色碳粉":[2,1],"黑色滾筒":[1,1],"彩色滾筒":[1,1],"黑色顯像槽":[1,0],"藍色顯像槽":[1,0],"紅色顯像槽":[1,0],"黃色顯像槽":[1,0],"加熱單元組":[1,0],"轉寫皮帶組":[1,0],"出紙單元":[0,0],"定著驅動部":[1,0]},
+  hist:{"MFP-01":{"黑色碳粉":[125400,48200]},"MFP-02":{"藍色碳粉":[98300,35600]}},
+  seq:0
+};
+const latestOf=(m,k)=>{const v=Object.values(SERVER.hist[m]||{}).map(x=>x[k]);return v.length?Math.max(...v):0};
+const api={
+  async getMachine(id,fail){
+    await wait(600);
+    if(fail)return {status:503,body:{error:"UNAVAILABLE",message:"服務暫時無法使用"}};
+    if(!SERVER.hist[id])return {status:404,body:{error:"NOT_FOUND"}};
+    return {status:200,body:{machineId:id,latestBw:latestOf(id,0),latestColor:latestOf(id,1),
+      lastByItem:JSON.parse(JSON.stringify(SERVER.hist[id])),
+      stock:Object.fromEntries(Object.entries(SERVER.stock).map(([k,[q,s]])=>[k,{qty:q,safety:s}]))}};
+  },
+  async postReport(b,mode){
+    await wait(650);
+    if(mode==="fail")return {status:503,body:{error:"UNAVAILABLE",message:"連線逾時，資料未建立"}};
+    if(mode==="conflict"){ // 模擬同事剛好先回報了同一台機器較新的轉數
+      const other=b.item==="黃色碳粉"?"紅色碳粉":"黃色碳粉";
+      const nb=b.counterBw+200,nc=b.counterColor+100;
+      SERVER.hist[b.machineId][other]=[nb,nc];SERVER.stock[other][0]=Math.max(0,SERVER.stock[other][0]-1);
+      records.unshift({time:new Date(),machine:b.machineId,item:other,qty:1,counter:[nb,nc],used:null,role:"領用人",name:"（模擬）其他同事",reason:"",remark:""});
+    }
+    if(b.counterBw<latestOf(b.machineId,0)||b.counterColor<latestOf(b.machineId,1))
+      return {status:409,body:{error:"COUNTER_CONFLICT",latestBw:latestOf(b.machineId,0),latestColor:latestOf(b.machineId,1)}};
+    if(b.qty>SERVER.stock[b.item][0])return {status:409,body:{error:"STOCK_CONFLICT",stockLeft:SERVER.stock[b.item][0]}};
+    const prev=(SERVER.hist[b.machineId]||{})[b.item]||null;
+    SERVER.stock[b.item][0]-=b.qty;SERVER.hist[b.machineId][b.item]=[b.counterBw,b.counterColor];
+    const id="R-"+String(++SERVER.seq).padStart(4,"0");
+    return {status:201,body:{reportId:id,prevBw:prev?prev[0]:null,prevColor:prev?prev[1]:null,
+      usedBw:prev?b.counterBw-prev[0]:null,usedColor:prev?b.counterColor-prev[1]:null,stockLeft:SERVER.stock[b.item][0]}};
+  },
+  undo(r){SERVER.stock[r.item][0]+=r.qty;if(r.prev)SERVER.hist[r.machine][r.item]=r.prev;else delete SERVER.hist[r.machine][r.item]}
+};
+
+/* ===== 畫面狀態（從 GET 回應取得） ===== */
+const machine=(params.get("m")||"MFP-01").trim().toUpperCase().slice(0,20); // 沒帶參數時以 MFP-01 示範
+const JUMP_MAX=25000, NAME_MAX=20, DIGITS_MAX=9;
+let M=null; // 最近一次 GET 的結果
+let loading=false,loadFailOnce=params.get("fail")==="load";
+let role="",item="",reason="",photoFile=null,busy=false,current=null;
+const records=[];
+const STOCK=()=>M?M.stock:{};
+const latest=k=>M?(k?M.latestColor:M.latestBw):0;
+const isToner=n=>n.endsWith("碳粉");
+const stockTotal=()=>Object.values(STOCK()).reduce((a,b)=>a+b.qty,0);
+
+function logGet(res){
+  $("logGet").innerHTML=`<p>請求：<b>GET /api/machines/${machine}</b>　回應 <span class="code${res.status>=400?" e":""}">${res.status}</span></p><pre>${esc(JSON.stringify(res.status===200?{machineId:res.body.machineId,latestBw:res.body.latestBw,latestColor:res.body.latestColor,stock:{[item||"黑色碳粉"]:res.body.stock[item||"黑色碳粉"],"…":"其餘 13 項略"}}:res.body,null,2))}</pre><p class="hint">畫面用途：最近轉數顯示在機台卡片、檢查轉數不可倒退；stock 顯示在品項與庫存紀錄。</p>`;
+}
+function logPost(body,res){
+  $("logPost").innerHTML=`<p>請求：<b>POST /api/reports</b>（請求內容 JSON）</p><pre>${esc(JSON.stringify(body,null,2))}</pre><p>回應 <span class="code${res.status>=400?" e":""}">${res.status}</span></p><pre>${esc(JSON.stringify(res.body,null,2))}</pre>`;
+}
+async function loadMachine(){
+  if(loading)return;loading=true;
+  const ls=$("loadState");ls.hidden=false;ls.className="load";ls.textContent="正在讀取機台資料…";
+  document.querySelector(".machine").classList.add("loading");lockForm(true);renderItems();
+  const fail=loadFailOnce||$("failLoad").checked;loadFailOnce=false;$("failLoad").checked=false;
+  const res=await api.getMachine(machine,fail);loading=false;document.querySelector(".machine").classList.remove("loading");logGet(res);
+  if(res.status!==200){
+    if(res.status===404){ls.className="load error";ls.innerHTML=`找不到機台「${esc(machine)}」，請重新掃描機台上的 QR Code。目前無法回報。`;renderAll();lockForm(true);return}
+    ls.className="load error";ls.innerHTML=`讀取機台資料失敗（模擬 ${res.status}），目前無法回報。已填的內容會保留。<button class="secondary" id="retryLoad" type="button">重新讀取</button>`;
+    $("retryLoad").onclick=loadMachine;renderAll();lockForm(true);$("retryLoad").focus();return;
+  }
+  M=res.body;ls.hidden=true;lockForm(!!current);renderAll();
+}
+
+function renderHeader(){
+  $("mName").textContent=machine;
+  $("mBw").textContent=M?fmt(latest(0)):"—";$("mColor").textContent=M?fmt(latest(1)):"—";
+  $("mStock").textContent=M?stockTotal()+" 件":"—";$("mDone").textContent=records.filter(r=>!r.name.startsWith("（模擬）")).length+" 筆";
+  $("counterHint").textContent=M?`請看機台操作面板「計數器」的黑白與彩色總張數；此機台最近紀錄：黑白 ${fmt(latest(0))}、彩色 ${fmt(latest(1))}。`:"機台資料讀取後會顯示最近轉數。";
+}
+function renderRoles(){
+  $("roles").innerHTML=ROLES.map(r=>`<button type="button" aria-pressed="${r===role}" data-r="${r}" ${locked()?"disabled":""}>${r}</button>`).join("");
+  $("roles").querySelectorAll("button").forEach(b=>b.onclick=()=>{if(locked())return;role=b.dataset.r;renderRoles();$("roles").querySelector(`[data-r="${role}"]`).focus()});
+}
+function renderItems(){
+  const st=STOCK();
+  $("itemGroups").innerHTML=GROUPS.map(g=>`<p class="group-title">${g.g}</p><div class="items">${g.items.map(([n,c])=>{const s=st[n]?st[n].qty:null;return `<button type="button" class="item" aria-pressed="${n===item}" data-n="${n}" ${s===null||s<=0||locked()?"disabled":""}><span class="sw" style="background:${c}"></span><span class="nm">${n}<span class="st">${s===null?"庫存讀取中":"庫存 "+s}</span></span></button>`}).join("")}</div>`).join("");
+  $("itemGroups").querySelectorAll(".item").forEach(b=>b.onclick=()=>{if(locked())return;item=b.dataset.n;if(isToner(item))reason="";$("reasonWrap").hidden=isToner(item);renderItems();renderReasons();const f=$("itemGroups").querySelector(`[data-n="${item}"]`);f&&f.focus()});
+}
+function renderReasons(){
+  $("reasons").innerHTML=REASONS.map(r=>`<button type="button" class="chip" aria-pressed="${r===reason}" data-r="${r}" ${locked()?"disabled":""}>${r}</button>`).join("");
+  $("reasons").querySelectorAll("button").forEach(b=>b.onclick=()=>{if(locked())return;const k=b.dataset.r;reason=reason===k?"":k;renderReasons();$("reasons").querySelector(`[data-r="${k}"]`).focus()});
+}
+$("remark").addEventListener("input",()=>{const n=[...$("remark").value].length;$("remarkCount").textContent=`${n}／${REMARK_MAX}`;$("remarkCount").classList.toggle("over",n>REMARK_MAX)});
+$("photo").addEventListener("change",e=>{photoFile=e.target.files[0]||null;if(photoFile){$("thumb").innerHTML=/^image\//.test(photoFile.type)?`<img alt="計數器照片" src="${URL.createObjectURL(photoFile)}">`:$("thumb").dataset.def;$("photoName").textContent=photoFile.name}});
+
+const ERRS=["e-role","e-item","e-num","e-photo","e-remark"];
+function clearErr(){ERRS.forEach(i=>$(i).textContent="");$("banner").textContent="";$("banner").className="banner";document.querySelectorAll(".bad").forEach(x=>x.classList.remove("bad"))}
+function banner(text,kind){$("banner").textContent=text;$("banner").className="banner "+kind}
+function validate(){
+  clearErr();
+  const name=$("name").value.trim(),st=STOCK();
+  if(!role)$("e-role").textContent="請選擇身分（領用人或代理人）。";
+  else if(!name)$("e-role").textContent="請填寫你的姓名。";
+  else if([...name].length>NAME_MAX)$("e-role").textContent=`姓名最多 ${NAME_MAX} 字，目前 ${[...name].length} 字。`;
+  if(!item)$("e-item").textContent="請選擇更換的品項。";
+  const q=$("qty").value.trim(),c=$("bw").value.trim(),cc=$("color").value.trim();
+  if(!/^\d+$/.test(q)||+q<1)$("e-num").textContent="數量請填 1 以上的整數。";
+  else if(item&&+q>st[item].qty)$("e-num").textContent=`庫存只剩 ${st[item].qty}，請確認數量。`;
+  else{
+    const chk=(v,k,lb)=>v===""?`請填寫${lb}轉數。`:!/^\d+$/.test(v)?`${lb}轉數請填 0 以上的整數。`:v.replace(/^0+(?=\d)/,"").length>DIGITS_MAX?`${lb}轉數最多 ${DIGITS_MAX} 位數，請再核對計數器。`:+v<latest(k)?`${lb}轉數不可小於此機台最近紀錄 ${fmt(latest(k))}，請再核對計數器。`:"";
+    const m=[chk(c,0,"黑白"),chk(cc,1,"彩色")].filter(Boolean);if(m.length)$("e-num").textContent=m.join(" ");
+  }
+  if(!photoFile)$("e-photo").textContent="請拍下計數器照片，才能送出。";
+  else if(!/^image\//.test(photoFile.type))$("e-photo").textContent="請選擇照片檔（例如 jpg、png、heic），目前的檔案不是圖片。";
+  const rl=[...$("remark").value].length;if(rl>REMARK_MAX)$("e-remark").textContent=`備註最多 ${REMARK_MAX} 字，目前 ${rl} 字，請刪減。`;
+  return ERRS.filter(i=>$(i).textContent);
+}
+function showProblems(errs){
+  banner(`還有 ${errs.length} 處需要修正，已帶你回到第一處。`,"error");
+  const first=errs[0];$(first).closest(".block").scrollIntoView({block:"start"});
+  const map={"e-role":role&&!$("name").value.trim()?"name":null,"e-num":$("e-num").textContent.includes("數量")||$("e-num").textContent.includes("庫存")?"qty":($("e-num").textContent.startsWith("彩色")?"color":"bw"),"e-remark":"remark"};
+  const t=map[first];if(t){$(t).classList.add("bad");$(t).focus({preventScroll:true})}
+}
+const locked=()=>busy||loading||!M||!!current;
+function lockForm(on){document.querySelectorAll("#f input,#f textarea,#f button").forEach(el=>{if(el.id!=="submitBtn")el.disabled=on});$("submitBtn").disabled=on;$("f").classList.toggle("is-locked",on)}
+
+$("f").addEventListener("submit",e=>{
+  e.preventDefault();if(locked())return;
+  const errs=validate();if(errs.length){showProblems(errs);return}
+  openConfirm();
+});
+function openConfirm(){
+  const rows=[["機台",machine],["品項",`${item} × ${$("qty").value}`],["黑白轉數",fmt(+$("bw").value)],["彩色轉數",fmt(+$("color").value)],[role,esc($("name").value.trim())]];
+  if(!isToner(item)&&reason)rows.push(["更換原因",reason]);
+  if($("remark").value.trim())rows.push(["備註",esc($("remark").value.trim())]);
+  rows.push(["計數器照片",`<img class="ph" alt="計數器照片" src="${$("thumb").querySelector("img").src}">`]);
+  $("confirmSum").innerHTML=rows.map(([k,v])=>`<div><span>${k}</span><b>${v}</b></div>`).join("");
+  const dBw=+$("bw").value-latest(0),dC=+$("color").value-latest(1);
+  const big=[[dBw,"黑白"],[dC,"彩色"]].filter(([d])=>d>JUMP_MAX);
+  const w=$("jumpWarn");
+  if(big.length){
+    w.hidden=false;
+    w.innerHTML=`${big.map(([d,lb])=>`${lb}轉數比此機台最近紀錄多 ${fmt(d)} 張`).join("、")}，超過平常（${fmt(JUMP_MAX)} 張以內），可能多打或少打一位數。請再看一次計數器。<label class="check"><input type="checkbox" id="jumpOk">我已再次核對計數器，數字正確</label>`;
+    $("confirmBtn").disabled=true;$("jumpOk").onchange=()=>{$("confirmBtn").disabled=!$("jumpOk").checked};
+  }else{w.hidden=true;w.innerHTML="";$("confirmBtn").disabled=false}
+  $("confirmBox").hidden=false;$("confirmTitle").focus();
+}
+$("backBtn").onclick=()=>{if(busy)return;$("confirmBox").hidden=true;banner("尚未送出，請修改後再按「送出領用回報」。","info");$("submitBtn").focus()};
+$("confirmBtn").onclick=async()=>{
+  if(busy||$("confirmBtn").disabled)return; // 防連按；轉數異常未核對時不送出
+  busy=true;$("confirmBtn").disabled=true;$("confirmBox").hidden=true;
+  lockForm(true);$("submitBtn").textContent="模擬處理中…";banner("正在模擬送出，請稍候，不要重複點擊。","info");$("submitBtn").scrollIntoView({block:"center"});
+  const modeEl=document.querySelector('input[name="sendMode"]:checked');const mode=modeEl?modeEl.value:"ok";
+  document.querySelector('input[name="sendMode"][value="ok"]').checked=true;
+  const body={machineId:machine,item,qty:+$("qty").value,counterBw:+$("bw").value,counterColor:+$("color").value,role,name:$("name").value.trim(),reason:isToner(item)?"":reason,remark:$("remark").value.trim(),photo:photoFile?photoFile.name:""};
+  const res=await api.postReport(body,mode);logPost(body,res);
+  busy=false;$("submitBtn").textContent="送出領用回報";
+  if(res.status===503){lockForm(false);renderAll();banner("模擬送出失敗（503 連線逾時），這筆沒有建立；已填資料與照片都已保留。請再按「送出領用回報」重試。","error");$("submitBtn").focus();return}
+  if(res.status===409){
+    const r2=await api.getMachine(machine,false);M=r2.body;logGet(r2);lockForm(false);renderAll();
+    if(res.body.error==="COUNTER_CONFLICT"){
+      banner(`這台機器剛有其他人回報較新的轉數（409 衝突），這筆沒有建立。最近轉數已更新為黑白 ${fmt(res.body.latestBw)}／彩色 ${fmt(res.body.latestColor)}，請再看一次計數器後修正。其他資料已保留。`,"error");
+      $("e-num").textContent="請依計數器重新填寫轉數，不可小於上方最近紀錄。";$("bw").classList.add("bad");$("bw").closest(".block").scrollIntoView({block:"start"});$("bw").focus({preventScroll:true});
+    }else{banner(`庫存已被更新（409 衝突），目前剩 ${res.body.stockLeft} 件，請確認數量。`,"error");$("qty").focus()}
+    return;
+  }
+  const prev=res.body.prevBw===null?null:[res.body.prevBw,res.body.prevColor];
+  current={id:res.body.reportId,time:new Date(),machine,item,qty:body.qty,counter:[body.counterBw,body.counterColor],prev,used:prev?[res.body.usedBw,res.body.usedColor]:null,role,name:body.name,reason:body.reason,remark:body.remark};
+  records.unshift(current);M.stock[item].qty=res.body.stockLeft;M.lastByItem[item]=[body.counterBw,body.counterColor];M.latestBw=Math.max(M.latestBw,body.counterBw);M.latestColor=Math.max(M.latestColor,body.counterColor);
+  banner("回報已完成，請到「本次結果」核對；欄位已鎖定避免重複送出。","info");
+  lockForm(true);renderAll();location.hash="result";$("resultTitle").focus();
+};
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("confirmBox").hidden)$("backBtn").click()});
+
+function renderResult(){
+  const b=$("resultBody");
+  if(!current){b.innerHTML=`<div class="empty"><p>目前沒有本次回報。請先在「領用回報」填寫並送出。</p><a class="return" href="#report">回到領用回報</a></div>`;return}
+  const r=current;
+  const life=r.used?`<div class="lifecard"><div>${r.machine} 的前一支${r.item}共使用</div><div class="pair"><div><div>黑白</div><div class="big">${fmt(r.used[0])}<small>張</small></div></div><div><div>彩色</div><div class="big">${fmt(r.used[1])}<small>張</small></div></div></div></div>`
+    :`<div class="lifecard first"><div>${r.machine}・${r.item}</div><div class="big" style="font-size:26px">首次紀錄</div><div>下次更換即可計算使用張數</div></div>`;
+  const rows=[["回報編號",r.id],["機台",r.machine],["品項",`${r.item} × ${r.qty}`],["安裝時轉數",`黑白 ${fmt(r.counter[0])}／彩色 ${fmt(r.counter[1])}`],[r.role,esc(r.name)]];
+  if(r.reason)rows.push(["更換原因",r.reason]);if(r.remark)rows.push(["備註",esc(r.remark)]);
+  rows.push(["時間",r.time.toLocaleString("zh-TW",{hour12:false})],["剩餘庫存",STOCK()[r.item].qty+" 件"]);
+  b.innerHTML=`<div class="ok-title"><i>✓</i>回報完成</div>${life}<div class="sum">${rows.map(([k,v])=>`<div><span>${k}</span><b>${v}</b></div>`).join("")}</div>
+  <span class="sim">模擬紀錄，未寫入公司系統。</span>
+  <button class="secondary" id="undoBtn" type="button">修改這筆回報</button>
+  <button class="secondary" id="nextBtn" type="button">再回報一筆</button>`;
+  $("undoBtn").onclick=undo;$("nextBtn").onclick=next;
+}
+function undo(){
+  if(!current||busy)return;const r=current;
+  api.undo(r);M.stock[r.item].qty+=r.qty;
+  if(r.prev)M.lastByItem[r.item]=r.prev;else delete M.lastByItem[r.item];
+  const v=Object.values(M.lastByItem);M.latestBw=v.length?Math.max(...v.map(x=>x[0])):0;M.latestColor=v.length?Math.max(...v.map(x=>x[1])):0;
+  records.splice(records.indexOf(r),1);current=null;lockForm(false);
+  banner("已退回本次回報並還原庫存；已填資料保留，請修改後重新送出。","info");
+  renderAll();location.hash="report";$("reportTitle").focus();
+}
+function next(){
+  current=null;lockForm(false);
+  ["bw","color","remark"].forEach(id=>$(id).value="");$("qty").value="1";item="";reason="";photoFile=null;$("photo").value="";
+  $("thumb").innerHTML=$("thumb").dataset.def;$("photoName").textContent="尚未附照片";$("remarkCount").textContent=`0／${REMARK_MAX}`;$("reasonWrap").hidden=true;
+  banner("可以開始下一筆回報；身分與姓名已保留。","info");
+  renderAll();location.hash="report";$("reportTitle").focus();
+}
+function renderStock(){
+  const st=STOCK();
+  $("stockList").innerHTML=M?GROUPS.map(g=>g.items.map(([n,c])=>{const{qty:s,safety:safe}=st[n];return `<div class="stockrow"><span class="sw" style="width:12px;height:12px;border-radius:50%;background:${c}"></span><span class="nm">${n}<br><small class="safe">安全量 ${safe}</small></span>${s<=safe?'<span class="tag warn">低於安全量</span>':""}<span class="q">${s}</span></div>`}).join("")).join(""):`<p style="color:var(--sub)">${loading?"正在讀取庫存…":"尚未取得庫存資料，請在上方「領用回報」重新讀取。"}</p>`;
+  $("recList").innerHTML=records.length?records.map(r=>`<div class="rec"><div class="t"><span>${r.item} × ${r.qty}</span><span>${r.machine}</span></div><div class="m">${esc(r.name)}（${r.role}）・黑白 ${fmt(r.counter[0])}／彩色 ${fmt(r.counter[1])}${r.used?`・前一支黑白 ${fmt(r.used[0])}、彩色 ${fmt(r.used[1])} 張`:"・首次紀錄"}${r.reason?`<span class="tag">${r.reason}</span>`:""}</div></div>`).join(""):`<p style="color:var(--sub)">尚無回報紀錄。送出第一筆後會出現在這裡。</p>`;
+}
+function renderAll(){renderHeader();renderRoles();renderItems();renderReasons();renderResult();renderStock();$("lockNote").hidden=!current}
+$("reloadBtn").onclick=()=>{if(current){banner("這筆回報已送出；請先按「修改這筆回報」或「再回報一筆」再重新讀取。","info");return}location.hash="report";loadMachine()};
+$("thumb").dataset.def=$("thumb").innerHTML;
+renderAll();loadMachine();
+</script>
+</body>
+</html>
